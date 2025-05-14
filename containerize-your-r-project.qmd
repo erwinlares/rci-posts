@@ -1,0 +1,38 @@
+---
+title: "Containerize your R project"
+author: "Erwin"
+format: html
+---
+
+## The quest for reproducibility 
+
+> "In science, reproducibility is the key to credibility. Without it, we are just guessing." 
+ - Richard Feynman
+ 
+
+## What do container contain?
+
+Containers are lightweight, portable units that package an application and all its dependencies so it can run consistently across different environments. They isolate software from the host system, ensuring that it behaves the same regardless of where it's deployed.
+
+At a minimum, a Podman/Docker container that runs R code includes:
+
+- Base OS Layer: A lightweight Linux distribution (e.g., Debian or Alpine).
+- R Runtime: The R language interpreter installed.
+- R Packages: Any required R packages (e.g., tidyverse, data.table).
+- Your Code: The R scripts or notebooks to be executed.
+- Dependencies: System libraries needed by R or its packages.
+- Entrypoint: A command to run the R code when the container starts.
+
+## Make it a Project!
+
+In the R programming language, especially within the `tidyverse` ecosystem, using **projects** (typically via `RStudio Projects`) is a best practice that supports reproducibility, organization, and collaboration.
+
+Using `Projects` enhances reproducibility by standardizing file paths and isolating environments, making analyses easier to rerun and share. They promote better organization through structured directories and project-specific settings, while also supporting collaboration by bundling all necessary files and configurations. Projects integrate smoothly with tools like `git` for version control and `renv` for package management, streamline workflows with consistent practices, and simplify onboarding for new contributors.
+
+Using `Projects`, however, can introduce some challenges, particularly for beginners who may find concepts like relative paths and environment management confusing. For quick or simple scripts, setting up a full project might feel excessive. Tools like `renv`, while powerful, can be complex to configure and maintain, especially across different systems. If not used carefully, projects can suffer from portability issues due to hard-coded paths or system-specific settings. Additionally, relying heavily on `RStudio Projects `may limit flexibility when switching to other development environments.
+
+## Containerize your project 
+
+For our case scenario, let us assume we have a proper project with some .R code that accomplishes a simple task: the script grabs a dataset about labs and clusters them into active, inactive, and intermitent status depending on whether the lab has been using a particular tool, has a pattern or starting/stopping using the tool, or tried the tool once and never used it again. 
+
+There is a preparatory step we need to take to make the containerization possible: we need a way to capture the dependencies needed for the code to run. The way we will follow is by way of the R package `renv`.
