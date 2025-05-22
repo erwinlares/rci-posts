@@ -10,6 +10,16 @@ format: html
  - Richard Feynman
  
 
+
+
+## Make it a Project!
+
+In the R programming language, especially within the `tidyverse` ecosystem, using projects (typically via `RStudio Projects`) is a best practice that supports reproducibility, organization, and collaboration.
+
+Using `Projects` enhances reproducibility by standardizing file paths and isolating environments, making analyses easier to rerun and share. They promote better organization through structured directories and project-specific settings, while also supporting collaboration by bundling all necessary files and configurations. Projects integrate smoothly with tools like `git` for version control and `renv` for package management, streamline workflows with consistent practices, and simplify onboarding for new contributors.
+
+Using `Projects`, however, can introduce some challenges, particularly for beginners who may find concepts like relative paths and environment management confusing. For quick or simple scripts, setting up a full project might feel excessive. Tools like `renv`, while powerful, can be complex to configure and maintain, especially across different systems. If not used carefully, projects can suffer from portability issues due to hard-coded paths or system-specific settings. Additionally, relying heavily on `RStudio Projects `may limit flexibility when switching to other development environments.
+
 ## What do container contain?
 
 Containers are lightweight, portable units that package an application and all its dependencies so it can run consistently across different environments. They isolate software from the host system, ensuring that it behaves the same regardless of where it's deployed.
@@ -23,16 +33,151 @@ At a minimum, a Podman/Docker container that runs R code includes:
 - Dependencies: System libraries needed by R or its packages.
 - Entrypoint: A command to run the R code when the container starts.
 
-## Make it a Project!
-
-In the R programming language, especially within the `tidyverse` ecosystem, using **projects** (typically via `RStudio Projects`) is a best practice that supports reproducibility, organization, and collaboration.
-
-Using `Projects` enhances reproducibility by standardizing file paths and isolating environments, making analyses easier to rerun and share. They promote better organization through structured directories and project-specific settings, while also supporting collaboration by bundling all necessary files and configurations. Projects integrate smoothly with tools like `git` for version control and `renv` for package management, streamline workflows with consistent practices, and simplify onboarding for new contributors.
-
-Using `Projects`, however, can introduce some challenges, particularly for beginners who may find concepts like relative paths and environment management confusing. For quick or simple scripts, setting up a full project might feel excessive. Tools like `renv`, while powerful, can be complex to configure and maintain, especially across different systems. If not used carefully, projects can suffer from portability issues due to hard-coded paths or system-specific settings. Additionally, relying heavily on `RStudio Projects `may limit flexibility when switching to other development environments.
-
 ## Containerize your project 
 
 For our case scenario, let us assume we have a proper project with some .R code that accomplishes a simple task: the script grabs a dataset about labs and clusters them into active, inactive, and intermitent status depending on whether the lab has been using a particular tool, has a pattern or starting/stopping using the tool, or tried the tool once and never used it again. 
 
 There is a preparatory step we need to take to make the containerization possible: we need a way to capture the dependencies needed for the code to run. The way we will follow is by way of the R package `renv`.
+
+
+
+```{r}
+#| label: generate-data
+#| eval: false 
+
+data <- NULL
+
+data <- tibble(year = 2000:2025)
+
+lab_names <- c( "Lake Mendota Research Collective","Bascom Systems Lab", "IronBadger Dynamics",
+"Terrace Signal ", "Isthmus Innovation Lab", "Cardinal Edge Research", "Union Catalyst Lab",
+"BuckyWorks Research Group", "MadLab 1848", "WiscoLab Nexus")
+
+
+for (lab in 1:length(lab_names)) {
+    
+data[lab + 1] = lab_names[lab]
+
+}
+
+data <- data |> 
+    pivot_longer(cols = 2:11, names_to = "discard", values_to = "lab_id") |>
+    select(-discard) |> 
+    mutate(usage = replicate(n(), paste0(sample(c("T", "F"), 12, replace = TRUE), collapse = "")))
+
+
+write_csv(data, "lab-active-data.csv")
+
+   
+```
+
+
+
+
+```{r}
+
+library(tidyverse)
+library(glue)
+library(stringi)
+
+data <- read_csv("lab-active-data.csv")
+
+
+num_peaks <- function(usage) {
+# a usage is a 12 character string containing F or T for each month. TRUE is active
+# num_peaks takes usage and returns the number of peaks of activity for that year,
+# OR 100 for activity every month of the year
+# OR 0 if inactive every month of the year
+case_when(str_detect(usage, "F{12}") ~ 0,
+          str_detect(usage, "T{12}") ~ 100,
+          str_detect(usage, "F*T+F+T+F+T+F+T+F+T+F+T+F*") ~ 6,
+          str_detect(usage, "F*T+F+T+F+T+F+T+F+T+F*") ~ 5,
+          str_detect(usage, "F*T+F+T+F+T+F+T+F*") ~ 4,
+          str_detect(usage, "F*T+F+T+F+T+F*") ~ 3,
+          str_detect(usage, "F*T+F+T+F*") ~2,
+          str_detect(usage, "F*T+F*") ~ 1)
+
+
+}
+
+num_peaks2 <- function(usage) {
+# a usage is a 12 character string containing F or T for each month. TRUE is active 
+# num_peaks takes usage and returns the number of peaks of activity for that year,
+# OR 100 for activity every month of the year
+# OR 0 if inactive every month of the year 
+
+case_when(usage == str_dup("F", str_length(usage)) ~ 0,
+          usage == str_dup("T", str_length(usage)) ~ 100,
+          TRUE ~ stri_count_regex(usage, "F*T+"))
+
+}
+
+
+how_active <- function(data, test_lab = unique(data$lab_id), test_year = unique(data$year)) {
+# how_active() takes a tibble(year, lab_id, and usage)
+# it returns a tibble where the first column is the lab_id and the second column is a
+# list containing  contaning a two-column tibble with the year and the number of peaks for that year
+# by default how_active() ranges over all the labs and all the years in the data argument
+# how_active() takes optionally a specific lab names and specific years  
+data |> 
+    filter(lab_id %in% test_lab, year %in% test_year) |>
+    group_by(lab_id, year) |> 
+    summarize(n_peaks = num_peaks(usage), #number of peaks of activity
+              w_peak = str_count(usage, pattern = 'T')/12, #weight of those peaks 
+              .groups = "drop") |> 
+    nest(.by = lab_id)
+
+}
+
+how_active2 <- function(data, test_lab = unique(data$lab_id), test_year = unique(data$year)) {
+# how_active() takes a tibble(year, lab_id, and usage)
+# it returns a tibble where the first column is the lab_id and the second column is a
+# list containing  contaning a two-column tibble with the year and the number of peaks for that year
+# by default how_active() ranges over all the labs and all the years in the data argument
+# how_active() takes optionally a specific lab names and specific years  
+data |> 
+    filter(lab_id %in% test_lab, year %in% test_year) |>
+    group_by(lab_id, year) |> 
+    summarize(n_peaks = num_peaks2(usage), #number of peaks of activity
+              w_peak = str_count(usage, pattern = 'T')/12, #weight of those peaks 
+              .groups = "drop") |> 
+    nest(.by = lab_id)
+
+}
+
+}
+```
+
+
+This is what copilot gave me 
+
+```{r}
+#| eval: false
+# Function to count peaks
+count_peaks <- function(usage) {
+    if (usage == paste(rep("T", 12), collapse = "")) {
+        return(100)
+    } else if (usage == paste(rep("F", 12), collapse = "")) {
+        return(0)
+    } else {
+        chars <- unlist(strsplit(usage, split = ""))
+        peaks <- 0
+        in_peak <- FALSE
+        for (char in chars) {
+            if (char == "T") {
+                if (!in_peak) {
+                    peaks <- peaks + 1
+                    in_peak <- TRUE
+                }
+            } else {
+                in_peak <- FALSE
+            }
+        }
+        return(peaks)
+    }
+}
+
+
+```
+
+
