@@ -149,35 +149,49 @@ data |>
 ```
 
 
-This is what copilot gave me 
+I'm leaning now more toward this, Copilot assisted code 
 
 ```{r}
-#| eval: false
-# Function to count peaks
-count_peaks <- function(usage) {
-    if (usage == paste(rep("T", 12), collapse = "")) {
-        return(100)
-    } else if (usage == paste(rep("F", 12), collapse = "")) {
-        return(0)
-    } else {
-        chars <- unlist(strsplit(usage, split = ""))
-        peaks <- 0
-        in_peak <- FALSE
-        for (char in chars) {
-            if (char == "T") {
-                if (!in_peak) {
-                    peaks <- peaks + 1
-                    in_peak <- TRUE
-                }
-            } else {
-                in_peak <- FALSE
-            }
-        }
-        return(peaks)
-    }
+
+library(tidyverse)
+library(stringi)
+
+data <- read_csv("lab-active-data.csv")
+
+
+# args <- commandArgs(trailingOnly = TRUE)
+# input_file <- args[1]
+# start_year <- as.integer(args[2])
+# start_month <- as.integer(args[3])
+# end_year <- as.integer(args[4])
+# end_month <- as.integer(args[5])
+# output_file <- args[6]
+
+
+
+
+count_peaks <- function(df, start_year, start_month, end_year, end_month) {
+
+df %>%
+  filter((year > start_year & year < end_year) |
+         (year == start_year) |
+         (year == end_year)) %>%
+  mutate(
+    usage_trimmed = case_when(
+      year == start_year & year == end_year ~ substr(usage, start_month, end_month),
+      year == start_year ~ substr(usage, start_month, 12),
+      year == end_year ~ substr(usage, 1, end_month),
+      TRUE ~ usage
+    ),
+    peaks = case_when(
+      usage_trimmed == str_dup("F", str_length(usage_trimmed)) ~ 0,
+      usage_trimmed == str_dup("T", str_length(usage_trimmed)) ~ 100,
+      TRUE ~ stri_count_regex(usage_trimmed, "F*T+")
+    )
+  )
 }
 
 
+
+write_csv(output_file)
 ```
-
-
