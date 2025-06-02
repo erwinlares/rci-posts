@@ -1,0 +1,467 @@
+---
+title: "ELN Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+#global options
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE, 
+                      include = TRUE)
+```
+
+```{r global, include=FALSE}
+#libraries 
+library(flexdashboard)
+library(tidyverse) #for dplyr and ggplot
+library(readxl)    # to read in input
+library(miceadds)  #for source.all function
+library(googlesheets4)  # for connecting to ELN google drive
+library(googledrive)
+library(gargle)         # for retrieving oauth2 token (wrapper)
+library(knitr)
+library(kableExtra)
+library(lubridate)
+library(plotly)
+library(glue)
+library(htmlwidgets)
+library(shiny)
+
+theme_set(theme_bw()) 
+
+uw_colors <- c("#c5050c", #red
+               "#656469", # gray darker
+               "#3d6666", # dark slate
+               "#97b85f", # green
+               "#9b0000", # red dark
+               "#282728", # gray darkest 
+               "#0479a8", # anchor color
+               "#ff8000", # orange
+               "#ffbf00", # yellow
+               "#e8dfa7", # beige 
+               "#6b9999", # light slate
+               "#dadfe1") # gray blue
+
+
+#read all the data in statically 
+
+#from the S3 buckets 
+usage <- read_csv("temp_usage.csv")
+
+#this is the data that needs to be incorporating
+usage_2 <- read_csv("eln_activities_logins_user_month.csv")
+#I'm assuming the col `Total Activities` is the same metric as 
+#activities_last_30_days
+
+usage_2 <- usage_2 |> 
+    mutate(email = Email,
+           date = as_date(glue("{Month}-01")),
+           activities_last_30_days = `Total Activities`) |> 
+    select(email, date, activities_last_30_days)
+
+usage <- bind_rows(usage, usage_2)
+
+rm(usage_2)
+
+lab_creation <- read_csv('lab_creation.csv')
+lab_creation <- lab_creation |>
+    rename(labid = LabID) |> 
+    group_by(labid) |> 
+    dplyr::summarize(created = date(min(created, na.rm = TRUE)))
+
+eln_users <- read_csv("eln_users.csv")
+eln_labs <- read_csv("eln_labs.csv")
+
+names(eln_users)[2] <- "email"
+
+#filter out the usage data by whether or not they are present in the googlesheet
+#usage <- right_join(usage, eln_users %>% select(email) , key = "email")
+
+# add an email and LabID column
+usage <- right_join(usage, eln_users |>  select(email, LabID) , by = "email")
+
+#add an onboarding column
+usage <- right_join(usage, eln_labs %>% select(LabID, Onboarding, Unit, Department), by = "LabID")
+
+#onboarding columns is a nightmare. This is a quick fix. I need to make this better extract the date from the character string, turn NA into real NAs as of now, anything that is not NA or NULL is considered as being onboarded.
+
+usage$Onboarding <- unlist(as.character(usage$Onboarding))
+usage$Onboarding <- ifelse(str_detect(usage$Onboarding, "(NA|NULL)"), FALSE, TRUE)
+  
+usage <- usage %>% 
+     rename(labid = LabID, 
+            onboarding = Onboarding,
+            department = Department) %>% 
+     mutate(month = as.integer(month(date)),
+            year = as.integer(year(date)))
+
+
+usage <- usage %>%
+    mutate(unit = case_when(Unit == "School of Medicine & Public Health" ~ "SMPH",
+                            Unit == "College of Letters & Science" ~ "L&S",
+                            Unit == "College of Agriculture & Life Sciences" ~ "CALS",
+                            Unit == "School of Pharmacy" ~ "SoP",
+                            Unit == "College of Engineering" ~ "CoE",               
+                            Unit == "School of Veterinary Medicine" ~ "SoVM",         
+                            Unit == "Wisconsin State Laboratory of Hygiene" ~ "WSLH",
+                            Unit == "Graduate School" ~ "GS",
+                            Unit == "School of Human Ecology" ~ "SoHE",                
+                            Unit == "School of Education" ~ "SoE",         
+                            Unit == "School of Social Work" ~ "SoSW",               
+                            Unit == "School of Nursing" ~ "SoN",    
+                            Unit == "LaFollette School of Public Affairs" ~ "LFSoPA",
+                            Unit == "Morgridge Institute" ~ "MI",
+                            Unit == "McArdle Laboratory for Cancer Research" ~ "SMPH"))
+
+
+# Jan wanted to weigh activities by how many users exist within a lab
+
+users_per_lab <- usage |> group_by(labid) |> distinct(email) |> dplyr::summarize(n_users = n())
+
+usage <- left_join(usage, users_per_lab, by = c("labid"))
+
+#version with date broken into components
+# usage_activities <- usage %>%
+#   group_by(unit, labid, year, month) %>% 
+#   summarize(activity = as.integer(sum(activities_last_30_days, na.rm = TRUE))) %>% 
+#   ungroup()
+
+#version keeping date as a full date object 
+usage_activities <- usage %>%
+  group_by(unit, labid, date) %>% 
+  dplyr::summarize(activity = as.integer(sum(activities_last_30_days, na.rm = TRUE))) %>% 
+  ungroup() |> 
+    filter(activity !=0) #take out months where there is no activity
+
+usage_patterns <- usage %>%
+  group_by(unit, labid, date) %>% 
+  dplyr::summarize(active = as.integer(sum(activities_last_30_days, na.rm = TRUE)) > 0) %>% 
+  ungroup()
+
+#default all present date to the first of the month
+usage_patterns$date <- glue("{year(usage_patterns$date)}-{month(usage_patterns$date)}-01") |> as_date()
+
+
+# values to use in the sidebar
+year_options <-  year(usage$date) |> unique() |> tibble() |> drop_na() |> arrange()
+year_recent <- unique(year(usage$date))[1]
+
+#function with full date
+#df dataset 
+#cut is the band of most active lab that will be displayed 
+#top 10% is cut = 10
+act_per_unit_plot <- function(df, cut_low, cut_high) {
+    #df the lab data 
+    #cut_high and cut_low define what % of the labs with 
+    #the most activity will be shown
+    #to show the top 5% of the labs cut_low = 95, cut_high = 100
+
+#top_labs are the labs that correspond to the cut percentage  
+    top_labs <- df |> 
+    group_by(labid) %>% 
+    dplyr::summarize(activity = sum(activity, na.rm = TRUE), .groups = "drop") %>%
+    filter(activity >= quantile(.$activity, probs = (cut_low/100)) &
+               activity <= quantile(.$activity, probs = (cut_high/100)))
+
+#builds the plot
+plot <- ggplot(aes(x = date, y = activity, color = labid), data = df |> filter(labid %in% top_labs$labid)) +
+    geom_point(alpha = 0.5, aes(text = glue("Lab: {labid}\n{activity}\n{date}"))) +
+    geom_line(alpha = 0.5) +
+    geom_smooth(method = "lm", se = FALSE, alpha = 0.75) +
+    labs(title = glue("Activity for top {cut_low}% - {cut_high}% Labs in {df$unit}")) +
+    ylab("Activity") 
+return(plot)
+}
+
+
+#list of units. contains the following 5 variables
+#char: unit, labid
+#date: date
+# integer: activity
+
+#splits the data into lists that contain unit | labid | date | activity 
+#for each of those, map2 calls the plot function for the cut percentage 
+#the are 9 units 
+# unit_activity contains a ggplot for each of those units 
+
+# function that returns complete a year for a lab
+#by filling in any missing months in the data
+#and adds a logical vector flagging whether the lab was active
+
+lab_to_pattern <- function(df) {
+
+if (nrow(df) != 12) {
+
+    yyyy <- year(df$date)[1]
+    unit_name <- df$unit[1]
+    labid_name <- df$labid[1]
+    
+    df <- df |> 
+        mutate(labid_date = glue("{labid}-{date}")) 
+    
+    model_year <- tribble(
+        ~unit, ~labid, ~date, ~active,
+        unit_name, labid_name, as_date(glue("{yyyy}-01-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-02-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-03-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-04-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-05-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-06-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-07-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-08-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-09-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-10-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-11-01")), FALSE,
+        unit_name, labid_name, as_date(glue("{yyyy}-12-01")), FALSE
+    ) |> 
+        mutate(labid_date = glue("{labid}-{date}"))
+    
+    completed_df <- model_year |> 
+        filter(!labid_date %in% df$labid_date) |> 
+        bind_rows(df) |> 
+        arrange(date) |> 
+        select(-labid_date)
+    return(completed_df)
+}
+else 
+    {return(df)}
+}
+
+#returns a percentage of how active the lab was in a year
+how_active <- function(current_word) {
+    round(str_count(current_word, "T")/12*100, 2)  
+}
+
+#returns the number of peaks in a year 
+whats_the_pattern <- function(current_word)
+{
+    pattern <- case_when(str_detect(current_word, "F{12}") ~ "0",
+                         str_detect(current_word, "T{12}") ~ "100",
+                         str_detect(current_word, "F*T+F+T+F+T+F+T+F+T+F+T+F*") ~ "6",
+                         str_detect(current_word, "F*T+F+T+F+T+F+T+F+T+F*") ~"5",
+                         str_detect(current_word, "F*T+F+T+F+T+F+T+F*") ~ "4",
+                         str_detect(current_word, "F*T+F+T+F+T+F*") ~ "3",
+                         str_detect(current_word, "F*T+F+T+F*") ~"2",
+                         str_detect(current_word, "F*T+F*") ~ "1")
+return(as.numeric(pattern))
+    
+}
+
+#takes as parameters a specific lab and a year
+#it returns 
+about_this_lab <- function(id_lab, year_lab){
+
+#this can return a tibble with ZERO rows, meaning
+# there isn't data for that lab in that year
+
+data <- usage_patterns |> 
+    filter(labid == id_lab, 
+           year(date) == year_lab)
+
+if(nrow(data) == 0) return("There isn't enough data for this lab")
+
+#vector containing the logical active variable
+patterned <- lab_to_pattern(data) 
+
+#"word" containing the pattern for a lab
+active_word <- paste(str_extract(patterned$active, ".?"), collapse = "")
+
+#checks the percentage of activity
+perc_activity <- how_active(active_word)
+
+#returns inactive (=0), active (=100) or number of peaks (1:6)
+pattern <- whats_the_pattern(active_word)
+
+ifelse(pattern == "0", glue("{id_lab} lab had no activity in {year_lab}"),
+       ifelse(pattern == "100", glue("{id_lab} lab has 100% activity in {year_lab}"),
+              glue("{id_lab} lab had {pattern} {ifelse(pattern == 1, 'peak', 'peaks')} in {year_lab} with {perc_activity}% overall activity")))
+
+}
+
+```
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+These controls allow you to specify Units, Labs, and Years to display in the longitudinal data tab.
+
+Use the slider to set what labs are displayed.
+
+Explore the pattern of activity of an individual lab by selecting labid and year.  
+
+```{r}
+selectInput("unit_eln", label = "Unit to display:",
+            choices = c("CALS", "CoE", "GS", "L&S", "SMPH", "SoE", "SoHE", "SoP", "SoVM"),
+            selected = "CALS")
+
+sliderInput("top_cut", label = "Top percentage of labs shown",
+            min = 0, max = 100, value = c(90,100), step = 5)
+
+textInput("lab", 
+          label = "Lab ID",
+          value = NULL,
+          width = "100%",
+          placeholder = "Enter the ID for the lab you want to examine")
+
+selectInput("year", label = "Year to examine",
+            choices = year_options,
+            selected = year_recent)
+
+# Unit 1 = CALS
+# Unit 2 = CoE  
+# Unit 3 = GS   
+# Unit 4 L&S  
+# Unit 5 SMPH 
+# Unit 6 SoE  <-- Not enough data 
+# Unit 7 SoHE <-- Not enoough data 
+# Unit 8 SoP  
+# Unit 9 SoVM
+
+
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Units Served
+
+```{r}
+units_eln <- usage |> select(unit) |> dplyr::distinct() |> nrow()
+valueBox(units_eln, icon = "fa-university", 
+         color = "#9b0000")
+
+```
+
+### Labs Served
+```{r}
+labs_eln <- usage |> select(labid) |> dplyr::distinct() |> nrow()
+valueBox(labs_eln, icon = "fa-flask", 
+         color = "#9b0000")
+
+```
+
+### Researchers Served
+```{r}
+users_eln <- usage |> select(email) |> dplyr::distinct() |> nrow()
+valueBox(users_eln, icon = "fa-user", 
+         color = "#9b0000")
+
+```
+
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Longitudinal Data 
+
+```{r}
+#from the side bar I get this user defined controls 
+# unit_eln --> specifies the unit that will be displayed
+#choices = c("CALS", "CoE", "GS", "L&S", "SMPH", "SoE", "SoHE", "SoP", "SoVM"),
+
+# top_cut --> specifies the top percentage of labs shown",
+# min = 0, max = 100, value = 5, step = 5)
+
+# p_vector contains the cutoff number of the top labs in each unit. I eyeballed those
+# values 
+# p_vector = c(10, 25, 100, 15, 5, 100, 100, 50, 35)
+
+#I don't need to map it any more ...
+# units_activity <- usage_activities %>% 
+#   group_by(unit) %>% 
+#   group_split() %>% 
+#      map2(.f = act_per_unit_plot, .y = p_vector)
+
+
+renderPlot({act_per_unit_plot(usage_activities |> filter(unit == input$unit_eln),
+                              cut_low = input$top_cut[1],
+                              cut_high = input$top_cut[2])
+})
+
+
+
+
+#renderPlot({(ggplotly(units_activity, tooltip = "text"))})# Unit 1 = CALS 10%
+
+
+```
+
+
+### Lab Adoption timeline 
+
+```{r}
+
+lab_creation_plot <- lab_creation |> 
+    mutate(year = year(created), 
+           month = month(created)) |>
+    group_by(year, month) |> 
+    dplyr::summarize(lab_name = paste(c(labid), collapse = ", "),
+              n = n()) |>
+    ggplot(aes(x = month, y = n)) +
+    geom_line(color = "#656469") +
+    geom_point(color = "#9b0000", 
+               aes(text = lab_name)) +
+    scale_y_discrete(name = "Number of created labs ") +  
+    scale_x_discrete(name = "Date of creation",
+                     labels = month.abb, 
+                     limits = 0:12) +
+  theme(axis.text.x = element_text(size = 3)) + 
+  labs(title = "ELN Adoption timeline",
+       caption = "each pair month-year represents new labs adopting the ELN service") +
+    facet_wrap(~year) +
+    ylim(0,15)
+
+(ggplotly(lab_creation_plot, tooltip = "text"))
+
+```
+
+
+Row {data-height=200}
+-----------------------------------------------------------------------
+### Usage Patterns per Lab 
+
+```{r}
+
+# usage_patterns contains a flag columns that indicates if the month in a year has recorded activity  
+
+
+#takes as parameters a specific lab and a year
+#it returns 
+plot_about_this_lab <- function(id_lab, year_lab){
+
+data <- usage_patterns |> 
+    filter(labid == id_lab, 
+           year(date) == year_lab)
+
+if(nrow(data) == 0) return(NULL)
+
+#vector containing the logical active variable
+patterned <- lab_to_pattern(data) |> drop_na()
+
+p <- patterned |>
+    ggplot(aes(x = 1:12, y = as.numeric(active))) +
+    geom_col(fill = "olivedrab") +
+    scale_x_discrete(name = "Month",
+                     labels = month.abb, 
+                     limits = 0:12) + 
+    labs(title = glue("{about_this_lab(input$lab, input$year)}"),
+         y = "Lab Activity") +
+    theme(axis.ticks.y = element_blank(),
+          axis.text.y = element_blank())
+    
+
+return(p)
+
+}
+
+renderPlot({(plot_about_this_lab(input$lab, input$year))})
+
+```
+
+

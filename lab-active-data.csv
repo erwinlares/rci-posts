@@ -1,0 +1,261 @@
+year,lab_id,usage
+2000,Lake Mendota Research Collective,FTTFFFFTFTTF
+2000,Bascom Systems Lab,FTFFFFTTTTFF
+2000,IronBadger Dynamics,FFFFFTTTFFTT
+2000,Terrace Signal ,FTFTFTFFTFTT
+2000,Isthmus Innovation Lab,FTFFFTFFTFFT
+2000,Cardinal Edge Research,FTTTFTFFTTTF
+2000,Union Catalyst Lab,TFTTFTTTTTTF
+2000,BuckyWorks Research Group,TTTFTFFFFTTF
+2000,MadLab 1848,TTTFTFTTTTFF
+2000,WiscoLab Nexus,TFTFTTTTFTTT
+2001,Lake Mendota Research Collective,FFFTFTTTTFTF
+2001,Bascom Systems Lab,FTFTTFFFFFTT
+2001,IronBadger Dynamics,FFFFFFFFFFFF
+2001,Terrace Signal ,FTTTTTFFFFFT
+2001,Isthmus Innovation Lab,TFFTFFFTFFTT
+2001,Cardinal Edge Research,TFFFFFFFFFTT
+2001,Union Catalyst Lab,FFTFFFFTFTFF
+2001,BuckyWorks Research Group,TFTFTFFTTFTT
+2001,MadLab 1848,TFTTTFFTFTTF
+2001,WiscoLab Nexus,TTTTFTTFTFFF
+2002,Lake Mendota Research Collective,FFFFTFTTTTTT
+2002,Bascom Systems Lab,TFFFFFFFTTFF
+2002,IronBadger Dynamics,TTFTTFTFFFTT
+2002,Terrace Signal ,FFTTFFTTFFFF
+2002,Isthmus Innovation Lab,FTTTTTFFFFFT
+2002,Cardinal Edge Research,FFTFTFTFFFTT
+2002,Union Catalyst Lab,FFTTFTFTTFTT
+2002,BuckyWorks Research Group,TFTFFFFTTTTF
+2002,MadLab 1848,TFTFTFFFFTFT
+2002,WiscoLab Nexus,FFTTFTFFFTTT
+2003,Lake Mendota Research Collective,TFFTTTFTTTFF
+2003,Bascom Systems Lab,FTFTFFFFTTTT
+2003,IronBadger Dynamics,TTFFTFFTFTFT
+2003,Terrace Signal ,FTFTTFTTFFFT
+2003,Isthmus Innovation Lab,TFFFFFTFTTTT
+2003,Cardinal Edge Research,TTFTFTFTTFFT
+2003,Union Catalyst Lab,FFTFFTTFFFFF
+2003,BuckyWorks Research Group,FFFFFFFFFFFF
+2003,MadLab 1848,TTTTFFTTTFTT
+2003,WiscoLab Nexus,TTTTTTTTTTTT
+2004,Lake Mendota Research Collective,TTTFFTFFTTTF
+2004,Bascom Systems Lab,FTTTFTFFFTTT
+2004,IronBadger Dynamics,FFFFTFTFFTFF
+2004,Terrace Signal ,FTFFFTFTTTTF
+2004,Isthmus Innovation Lab,TFTTTFTTTTTF
+2004,Cardinal Edge Research,TTTFFTTTFFFF
+2004,Union Catalyst Lab,FFFTTTFTTTTF
+2004,BuckyWorks Research Group,FFTFTFFFTTFF
+2004,MadLab 1848,FFFTFTFFTTTF
+2004,WiscoLab Nexus,TFFFTTTTFTTF
+2005,Lake Mendota Research Collective,TFTFTFFFFFTF
+2005,Bascom Systems Lab,FFFTTTFTTTTT
+2005,IronBadger Dynamics,TTTFTFFFTTTF
+2005,Terrace Signal ,FFTTFFTTTTTF
+2005,Isthmus Innovation Lab,TFFTTFFFFFTT
+2005,Cardinal Edge Research,FFTFFTFFTTTF
+2005,Union Catalyst Lab,TFFFTFTTFTTF
+2005,BuckyWorks Research Group,TTFTTTFTTTTT
+2005,MadLab 1848,FTTTTTTFTFTF
+2005,WiscoLab Nexus,TTTFFFFTTTTT
+2006,Lake Mendota Research Collective,FTFFTTTFTTFT
+2006,Bascom Systems Lab,TFTFFFFFFTTT
+2006,IronBadger Dynamics,FTTTFFFTFFFT
+2006,Terrace Signal ,TTTFFTFFTTTT
+2006,Isthmus Innovation Lab,TTFTTTTTFFTF
+2006,Cardinal Edge Research,TFFTFFTFFTFT
+2006,Union Catalyst Lab,TTTTTTTTTTTT
+2006,BuckyWorks Research Group,FTFFFFTTTTTT
+2006,MadLab 1848,FTTFTFFTTFFF
+2006,WiscoLab Nexus,TFTTFFFFTFFT
+2007,Lake Mendota Research Collective,FFTTFTFFTTTF
+2007,Bascom Systems Lab,TTTTTFFTFTTT
+2007,IronBadger Dynamics,TTFFTTFFTFTT
+2007,Terrace Signal ,TFTTFFTTTTTF
+2007,Isthmus Innovation Lab,FTFTFFTTTTTF
+2007,Cardinal Edge Research,FTFFFTTFTTTT
+2007,Union Catalyst Lab,FTTTTFTTFFFT
+2007,BuckyWorks Research Group,TFFFTTFTTFFF
+2007,MadLab 1848,TTTFTFTTTFFT
+2007,WiscoLab Nexus,TTFFFTFFFTFT
+2008,Lake Mendota Research Collective,FTTFFFTTFTTT
+2008,Bascom Systems Lab,TTFFFTTFTTFT
+2008,IronBadger Dynamics,TTFFTFFTTTFF
+2008,Terrace Signal ,FTTTTFTTTFFT
+2008,Isthmus Innovation Lab,FFFTTTTTFFFT
+2008,Cardinal Edge Research,TFFFFFFFTTTF
+2008,Union Catalyst Lab,TTFFTFTFTFFT
+2008,BuckyWorks Research Group,FTFTFTFFFFTT
+2008,MadLab 1848,FTFTFFTFTTTF
+2008,WiscoLab Nexus,TFFFTTFTTTFF
+2009,Lake Mendota Research Collective,TTTTFFTTFFFT
+2009,Bascom Systems Lab,FTFFTTTTTFFT
+2009,IronBadger Dynamics,TFTTTTTTFTTT
+2009,Terrace Signal ,FTTFFTTFTFTT
+2009,Isthmus Innovation Lab,TTFTTFTTTFFT
+2009,Cardinal Edge Research,FTTTFFFTFFFT
+2009,Union Catalyst Lab,TFFFFTFTFTFF
+2009,BuckyWorks Research Group,TTTTTTTTTTTT
+2009,MadLab 1848,TTTFTFFFTTFF
+2009,WiscoLab Nexus,TTTTTTFFFFTT
+2010,Lake Mendota Research Collective,FTTFFTTFFTTT
+2010,Bascom Systems Lab,TFTFFTFTFTFF
+2010,IronBadger Dynamics,FTTFTFTTFTFF
+2010,Terrace Signal ,FTFFTFTTFTTF
+2010,Isthmus Innovation Lab,TTFTTTFTFFFF
+2010,Cardinal Edge Research,FFTFFFTFFFFT
+2010,Union Catalyst Lab,TTTTTTFFTFFT
+2010,BuckyWorks Research Group,TTFFFTTTFTFF
+2010,MadLab 1848,FTFFFTTTTTTT
+2010,WiscoLab Nexus,FFFTFFFFTFTF
+2011,Lake Mendota Research Collective,TTFFFFTFFTFF
+2011,Bascom Systems Lab,FTFTTFFTTTTT
+2011,IronBadger Dynamics,TFFTFFTFTFFF
+2011,Terrace Signal ,FFFFTFFFTTFF
+2011,Isthmus Innovation Lab,TFFFFTFFTFFT
+2011,Cardinal Edge Research,FFTTTTFFFFTF
+2011,Union Catalyst Lab,TTFTTFTFFTTF
+2011,BuckyWorks Research Group,FTFTTFFFFTFF
+2011,MadLab 1848,FFFFFFTFFFTT
+2011,WiscoLab Nexus,FTTFTTFFFTFT
+2012,Lake Mendota Research Collective,TFTTTTTTFTFF
+2012,Bascom Systems Lab,TTTTTTTTTTTT
+2012,IronBadger Dynamics,TFTFTTFFTTTT
+2012,Terrace Signal ,FTTFFFTFTTTF
+2012,Isthmus Innovation Lab,FTFFFFFTTFTF
+2012,Cardinal Edge Research,FTTFFFFFTFTF
+2012,Union Catalyst Lab,FFTFTTTTTFFF
+2012,BuckyWorks Research Group,FFTTTFFFTTFF
+2012,MadLab 1848,TTFTFFFTTTFT
+2012,WiscoLab Nexus,TFTFTFFFTFTF
+2013,Lake Mendota Research Collective,FFTTFFTTTFFT
+2013,Bascom Systems Lab,TTFFTTTFTFTF
+2013,IronBadger Dynamics,TTTTFFFFFFTT
+2013,Terrace Signal ,TTTTFFFFTFTT
+2013,Isthmus Innovation Lab,TTFTTTTFTFTT
+2013,Cardinal Edge Research,FFFTFTTFFFTT
+2013,Union Catalyst Lab,FFFFTTTTTFTF
+2013,BuckyWorks Research Group,FTTFTTTTTTFT
+2013,MadLab 1848,TTFTFFFFFTTT
+2013,WiscoLab Nexus,FTFTTTFFFTTF
+2014,Lake Mendota Research Collective,TTFFTTFFFFTT
+2014,Bascom Systems Lab,FFTTFFFTFFFF
+2014,IronBadger Dynamics,TFFFFTFTFFTT
+2014,Terrace Signal ,TTTTTTFTTFFT
+2014,Isthmus Innovation Lab,TTFTFFFTTFFT
+2014,Cardinal Edge Research,TTTTTTTTTTTT
+2014,Union Catalyst Lab,TTTFTFFFTFFT
+2014,BuckyWorks Research Group,TFFFTTTFTFTT
+2014,MadLab 1848,FTFFTTFFFTTT
+2014,WiscoLab Nexus,TFTTFTTFTFFT
+2015,Lake Mendota Research Collective,FTFFTFTFFTFT
+2015,Bascom Systems Lab,TFTTTFFFFTFT
+2015,IronBadger Dynamics,FTFTTFFFTFFF
+2015,Terrace Signal ,TTTFTFTTTFFT
+2015,Isthmus Innovation Lab,TTTTFTTFTTFF
+2015,Cardinal Edge Research,TFTFFFFFTTFF
+2015,Union Catalyst Lab,FTFTFFTFFFFT
+2015,BuckyWorks Research Group,FFTFFTFFFFFT
+2015,MadLab 1848,TTTTTFFTFFFT
+2015,WiscoLab Nexus,FFTTTFTFTFTF
+2016,Lake Mendota Research Collective,TTTTTTTTTTTT
+2016,Bascom Systems Lab,FTTFTTFTTTTF
+2016,IronBadger Dynamics,TTTTTTTTFFFT
+2016,Terrace Signal ,TTTTTFFTTFFT
+2016,Isthmus Innovation Lab,FFTFFFFFFFTT
+2016,Cardinal Edge Research,TTTFFFTTTTTT
+2016,Union Catalyst Lab,TFFFTFFTFFFF
+2016,BuckyWorks Research Group,TFTFFFTFFTFF
+2016,MadLab 1848,FTFFTFTTTTFT
+2016,WiscoLab Nexus,TFTFFFTFTFTT
+2017,Lake Mendota Research Collective,FFTFFFFTFFTF
+2017,Bascom Systems Lab,TFFFTFFTFFFF
+2017,IronBadger Dynamics,FTTFFFTTFFFT
+2017,Terrace Signal ,FFFTTTTFTFTT
+2017,Isthmus Innovation Lab,TTTTTFFFTFFT
+2017,Cardinal Edge Research,FFFFFFFFFFFF
+2017,Union Catalyst Lab,TTFTTFFFFTTF
+2017,BuckyWorks Research Group,TFFFFFFTFFTF
+2017,MadLab 1848,FFTTFTFTFTTT
+2017,WiscoLab Nexus,FFTTTTTTFTFT
+2018,Lake Mendota Research Collective,FFTTFTTTTFTF
+2018,Bascom Systems Lab,FFFFTFFTTFTT
+2018,IronBadger Dynamics,FTFTTFTFTFFT
+2018,Terrace Signal ,TFTFTTTFFFFT
+2018,Isthmus Innovation Lab,FFFFFFFFFFFF
+2018,Cardinal Edge Research,TFFFTTTFTTTF
+2018,Union Catalyst Lab,FFFFFFTTTTTT
+2018,BuckyWorks Research Group,FTFTFFTTFFTT
+2018,MadLab 1848,TTTTFFTTFFTT
+2018,WiscoLab Nexus,TTTTTTFTFTFT
+2019,Lake Mendota Research Collective,FFFFFTTTTTFT
+2019,Bascom Systems Lab,FFFTFTFTTTTF
+2019,IronBadger Dynamics,FFTFTFFFTTTF
+2019,Terrace Signal ,TTFFFTTFTFFF
+2019,Isthmus Innovation Lab,TFFFFFTTFTTT
+2019,Cardinal Edge Research,FTTFFFFFTFFT
+2019,Union Catalyst Lab,FFTFFFFFFTTT
+2019,BuckyWorks Research Group,TTFFFFFTFFFT
+2019,MadLab 1848,FFFFTTFTTFTT
+2019,WiscoLab Nexus,FFTTTTFTTFTT
+2020,Lake Mendota Research Collective,TFTTFFFTFFFT
+2020,Bascom Systems Lab,FFTTTTTFFFTF
+2020,IronBadger Dynamics,TFFFFTTTFTFT
+2020,Terrace Signal ,FFFFFFFFFFFF
+2020,Isthmus Innovation Lab,FTTTTTFFTFFT
+2020,Cardinal Edge Research,FTFFTFFTTFFF
+2020,Union Catalyst Lab,FTFFFTFTTTFF
+2020,BuckyWorks Research Group,FTTFTTFTTFTT
+2020,MadLab 1848,FFTTFTTFTFFF
+2020,WiscoLab Nexus,FFTTFFFTTTTT
+2021,Lake Mendota Research Collective,TFTFTFFFFFFT
+2021,Bascom Systems Lab,FFFTTTTTTFTT
+2021,IronBadger Dynamics,FTFTFFTFFTTF
+2021,Terrace Signal ,FTTTFTFFTTTF
+2021,Isthmus Innovation Lab,TFFTTTFTTTTF
+2021,Cardinal Edge Research,FTTFFFFFFTFF
+2021,Union Catalyst Lab,FTTTTTFTTFFT
+2021,BuckyWorks Research Group,TTFTTTFTTTTF
+2021,MadLab 1848,FFFTFTTFFFTT
+2021,WiscoLab Nexus,TFFFFTFTTTFT
+2022,Lake Mendota Research Collective,TTTFFTTTFFFF
+2022,Bascom Systems Lab,FFTTTTFFTTFF
+2022,IronBadger Dynamics,TTTFTTTTFTFF
+2022,Terrace Signal ,TTTFFFTFFTFT
+2022,Isthmus Innovation Lab,TFFTTFFFFFTT
+2022,Cardinal Edge Research,TFTTFTTFTFFT
+2022,Union Catalyst Lab,FTFTTTFTTFTF
+2022,BuckyWorks Research Group,TTFFTTFFTTFF
+2022,MadLab 1848,FFTTFFTFTFFT
+2022,WiscoLab Nexus,TFTFFTFFTTTF
+2023,Lake Mendota Research Collective,FFFFTFTFTTFT
+2023,Bascom Systems Lab,FFFFFFFTFFTT
+2023,IronBadger Dynamics,FTTFTTTTFTTT
+2023,Terrace Signal ,TTTTFTTFFTFT
+2023,Isthmus Innovation Lab,FTTTTFTFFFTT
+2023,Cardinal Edge Research,TTFTTTTTTFTT
+2023,Union Catalyst Lab,TTTTTFFTTFFF
+2023,BuckyWorks Research Group,FFTFTTTFFFTF
+2023,MadLab 1848,TTTFTTTFTFTF
+2023,WiscoLab Nexus,FFFFFFFFFFFF
+2024,Lake Mendota Research Collective,TTTTTTTFFFFF
+2024,Bascom Systems Lab,TTFTFTTTTFTT
+2024,IronBadger Dynamics,TFFTTTTTFFTT
+2024,Terrace Signal ,TTTTFTTFTFFF
+2024,Isthmus Innovation Lab,TFTFFFFFTTTT
+2024,Cardinal Edge Research,FTFTTFFFTTTF
+2024,Union Catalyst Lab,TFTFFTTTTFTF
+2024,BuckyWorks Research Group,FFTTFTTTTFTF
+2024,MadLab 1848,TFTTTFTFFTFT
+2024,WiscoLab Nexus,TFFTTFFTFTTF
+2025,Lake Mendota Research Collective,FTFFTFFFTTTF
+2025,Bascom Systems Lab,FTFTTFFFTFTF
+2025,IronBadger Dynamics,FTTFTTTTTTFT
+2025,Terrace Signal ,TTFTFFFFFFFF
+2025,Isthmus Innovation Lab,FFFFFFFFFFFF
+2025,Cardinal Edge Research,FFFFFFFTTFTF
+2025,Union Catalyst Lab,FTTFTFFFTFTT
+2025,BuckyWorks Research Group,TTFFFTFTFFFT
+2025,MadLab 1848,FFFTTTFFFFTT
+2025,WiscoLab Nexus,FTTFFTFFFTTF
