@@ -54,9 +54,9 @@ data <- read_csv("lab-active-data.csv") #reads in the data
 
 ```
 
-For our case scenario, let us assume we have a proper project with some .R code that accomplishes a simple task: the script takes as an input a dataset about labs that use a RCI resource and as an output estimates how frequently that lab uses that particular resource across time.  
+For our case scenario, let us assume we have a proper project with some R code that accomplishes a simple task: the script takes as an input a dataset about research facibilities that use a resource and as an output estimates how frequently that lab uses that particular resource across time.  
 
-The dataset minimally contains as variables an integer `year`, a character `lab_id`, and a character `usage`. `year`. `year` is the year where usage data is recorded. `lab_id` is a character identifier for the lab. `usage` is a twelve-character string that indicates if the lab used the resource in a month of the corresponding `year`; `usage` looks like "FTFFTTTFTFFT", one for every month of the year, "T" if the resource was used, `F` otherwise.
+The dataset contains three columns: `year`,`lab_id`, and`usage`. The varibale `year` is the year where usage data is recorded. `lab_id` is a character identifier for the lab. `usage` is a twelve-character string that indicates if the lab used the resource in a month of the corresponding `year`; `usage` looks like "FTFFTTTFTFFT", one for every month of the year, `T` if the resource was used, `F` otherwise.
 
 Here's a slice of the dataset showing its structure. 
 
@@ -196,31 +196,63 @@ data |>
 
 
 # Function to extract usage pattern
-get_extended_pattern <- function(df, lab_id, start_year, start_month, end_year, end_month) {
-  # Filter for the lab and year range
-  filtered_df <- df %>%
-    filter(lab_id == lab_id,
-           year >= start_year,
-           year <= end_year)
-  
-  pattern <- ""
-  
-  for (i in 1:nrow(filtered_df)) {
-    year <- filtered_df$year[i]
-    usage <- filtered_df$usage[i]
-    
-    start_idx <- if (year == start_year) start_month else 1
-    end_idx <- if (year == end_year) end_month else 12
-    
-    pattern <- paste0(pattern, substr(usage, start_idx, end_idx))
-  }
-  
-  return(pattern)
+# get_extended_pattern <- function(df, lab_id, start_year, start_month, end_year, end_month) {
+#   # Filter for the lab and year range
+#   filtered_df <- df |> 
+#     filter(lab_id == lab_id,
+#            year >= start_year,
+#            year <= end_year)
+#   
+#   pattern <- ""
+#   
+#   for (i in 1:nrow(filtered_df)) {
+#     year <- filtered_df$year[i]
+#     usage <- filtered_df$usage[i]
+#     
+#     start_idx <- if (year == start_year) start_month else 1
+#     end_idx <- if (year == end_year) end_month else 12
+#     
+#     pattern <- paste0(pattern, substr(usage, start_idx, end_idx))
+#   }
+#   
+#   return(pattern)
+# }
+
+
+## New version of get_extended_usage
+
+library(dplyr)
+library(stringr)
+library(purrr)
+
+get_extended_usage <- function(df, lab_id, start_year, start_month, end_year, end_month) {
+  df |> 
+    filter(lab_id == !!lab_id, year >= start_year, year <= end_year) %>%
+    arrange(year) |> 
+    mutate(
+      usage_split = str_split(usage, "", simplify = FALSE),
+      usage_trimmed = pmap_chr(
+        list(year, usage_split),
+        function(y, u) {
+          if (y == start_year && y == end_year) {
+            str_c(u[start_month:end_month], collapse = "")
+          } else if (y == start_year) {
+            str_c(u[start_month:12], collapse = "")
+          } else if (y == end_year) {
+            str_c(u[1:end_month], collapse = "")
+          } else {
+            str_c(u, collapse = "")
+          }
+        }
+      )
+    ) |> 
+    pull(usage_trimmed) %>%
+    str_c(collapse = "")
 }
 
 # Function to create the plot
 plot_usage_pattern <- function(df, lab_id, start_year, start_month, end_year, end_month) {
-  pattern <- get_extended_pattern(df, lab_id, start_year, start_month, end_year, end_month)
+  pattern <- get_extended_usage(df, lab_id, start_year, start_month, end_year, end_month)
   num_months <- nchar(pattern)
   
   # Create time sequence
@@ -242,8 +274,10 @@ plot_usage_pattern <- function(df, lab_id, start_year, start_month, end_year, en
 
 # Example usage
 
-plot_usage_pattern(data, "Lake Mendota Research Collective", 2000, 1, 2001, 6)
+plot_usage_pattern(data, "Lake Mendota Research Collective", 2000, 1, 2000, 6)
 
+get_extended_usage(data, "Lake Mendota Research Collective", 2000, 1, 2001, 1)
+get_extended_usage(data, "Bascom Systems Lab", 2000, 2000, 1, 12)
 ```
 
 
