@@ -56,7 +56,7 @@ data <- read_csv("lab-active-data.csv") #reads in the data
 
 For our case scenario, let us assume we have a proper project with some R code that accomplishes a simple task: the script takes as an input a dataset about research facibilities that use a resource and as an output estimates how frequently that lab uses that particular resource across time.  
 
-The dataset contains three columns: `year`,`lab_id`, and`usage`. The varibale `year` is the year where usage data is recorded. `lab_id` is a character identifier for the lab. `usage` is a twelve-character string that indicates if the lab used the resource in a month of the corresponding `year`; `usage` looks like "FTFFTTTFTFFT", one for every month of the year, `T` if the resource was used, `F` otherwise.
+The dataset contains three columns: `year`,`lab_id`, and`usage`. The variable `year` is the year where usage data is recorded. `lab_id` is a character identifier for the lab. `usage` is a twelve-character string that indicates if the lab used the resource in a month of the corresponding `year`; `usage` looks like "FTFFTTTFTFFT", one for every month of the year, `T` if the resource was used, `F` otherwise.
 
 Here's a slice of the dataset showing its structure. 
 
@@ -64,7 +64,7 @@ Here's a slice of the dataset showing its structure.
 slice_sample(data, n=10)
 ```
 
-To gauge usage, we want to identify "peaks" of activity where the lab in question accessed the service. We differentiate between a month in which the service is accessed/used and a peak. A peak of usage is any numbers of consecutive months where the resource was utilized. The idea is that we can have, and we want to identified, sustained periods of activity that can last one or more months. In addition, we want to know how frequent the use is. A lab may be having one peak of activity lasting 6 months of the year, and thus a usage frequency of 50%, whereas another lab may have two peaks, each one lasting only two months. As a result, the one-peak lab was using the resource more frequently than the two-peak labs in the same period of time.
+To gauge usage, we want to identify "peaks" of activity where the lab in question accessed the service. We differentiate between a month in which the service is accessed/used and a peak. A peak of usage is any numbers of consecutive months where the resource was utilized. The idea is that we can have, and we want to identified, sustained periods of activity that can last one or more months. In addition, we want to know how sustained the usage is. A lab may be having one peak of activity lasting 6 months of the year, and thus a usage frequency of 50%, whereas another lab may have two peaks, each one lasting only two months. As a result, the one-peak lab uses the resource more frequently than the two-peak labs in the same period of time.
 
 
 ## The logic 
@@ -189,6 +189,7 @@ data |>
 
 }
 
+was_active(data, "Bascom Systems Lab", 2005, 8)
 
 ```
 
@@ -280,7 +281,7 @@ get_extended_usage(data, "Lake Mendota Research Collective", 2000, 1, 2001, 1)
 get_extended_usage(data, "Bascom Systems Lab", 2000, 2000, 1, 12)
 ```
 
-
+Look at the plot for Lake Mendota Research Collective, we see that they actively used the ELN service for the months of February and March, but have stopped since.  
 
 
 
